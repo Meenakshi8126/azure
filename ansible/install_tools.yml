@@ -1,0 +1,48 @@
+---
+- name: Setup AKS management tools
+  hosts: localhost
+  become: yes
+  vars:
+    helm_path: /usr/local/bin/helm
+    kubectl_path: /snap/bin/kubectl
+    az_path: /usr/bin/az
+  tasks:
+
+    - name: Ensure curl is installed
+      apt:
+        name: curl
+        state: present
+        update_cache: yes
+
+    - name: Check if Azure CLI is already installed
+      stat:
+        path: "{{ az_path }}"
+      register: azcli_check
+
+    - name: Install Azure CLI if not present
+      shell: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      when: not azcli_check.stat.exists
+
+    - name: Check if kubectl is installed
+      stat:
+        path: "{{ kubectl_path }}"
+      register: kubectl_check
+
+    - name: Install kubectl via snap if not present
+      snap:
+        name: kubectl
+        classic: yes
+        state: present
+      when: not kubectl_check.stat.exists
+
+    - name: Check if Helm is installed
+      stat:
+        path: "{{ helm_path }}"	
+      register: helm_check
+
+    - name: Install Helm if not present
+      shell: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      when: not helm_check.stat.exists
+
