@@ -1,23 +1,25 @@
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.DurableTask.Client;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Fti.Workday;
 
 public partial class Leave
 {
-    [Function(nameof(ImportApprovedLeaveHttp))]
-    public async Task<HttpResponseData> ImportApprovedLeaveHttp(
+    [FunctionName(nameof(ImportApprovedLeaveHttp))]
+    public async Task<IActionResult> ImportApprovedLeaveHttp(
         [HttpTrigger(AuthorizationLevel.Function, "get", "post")]
-        HttpRequestData req, //HttpRequest req,
-        [DurableClient] DurableTaskClient starter)
+        HttpRequest req,
+        [DurableClient] IDurableOrchestrationClient starter)
     {
 
-        string instanceId = await starter.ScheduleNewOrchestrationInstanceAsync(nameof(ImportApprovedLeave));
+        string instanceId = await starter.StartNewAsync(nameof(ImportApprovedLeave));
 
             // Returns an HTTP 202 response with an instance management payload.
             // See https://learn.microsoft.com/azure/azure-functions/durable/durable-functions-http-api#start-orchestration
-        return await starter.CreateCheckStatusResponseAsync(req, instanceId);
+        return starter.CreateCheckStatusResponse(req, instanceId);
 
     }
 }

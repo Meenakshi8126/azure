@@ -1,17 +1,16 @@
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Extensions.Timer;
-using Microsoft.DurableTask.Client;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace Fti.Workday;
 
 public partial class Leave
 {
-    [Function(nameof(ImportApprovedLeaveTimer))]
+    [FunctionName(nameof(ImportApprovedLeaveTimer))]
     public async Task ImportApprovedLeaveTimer(
         [TimerTrigger("0 0 2 * * *")] TimerInfo timer,
-        [DurableClient] DurableTaskClient starter)
+        [DurableClient] IDurableOrchestrationClient starter)
     {
-        string instanceId = await starter.ScheduleNewOrchestrationInstanceAsync(nameof(ImportApprovedLeave));
+        string instanceId = await starter.StartNewAsync(nameof(ImportApprovedLeave));
         
         // Log the orchestration instance ID for monitoring
         // You can add logging here if needed
