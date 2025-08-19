@@ -1,3 +1,6 @@
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.DurableTask.Client;
+
 namespace Fti.Workday;
 
 public partial class Leave
