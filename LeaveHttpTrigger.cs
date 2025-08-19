@@ -16,15 +16,4 @@ public partial class Leave
         return await starter.CreateCheckStatusResponseAsync(req, instanceId);
 
     }
-
-    [Function(nameof(ImportApprovedLeaveTimer))]
-    public async Task ImportApprovedLeaveTimer(
-        [TimerTrigger("0 0 2 * * *")] TimerInfo timer,
-        [DurableClient] DurableTaskClient starter)
-    {
-        string instanceId = await starter.ScheduleNewOrchestrationInstanceAsync(nameof(ImportApprovedLeave));
-        
-        // Log the orchestration instance ID for monitoring
-        // You can add logging here if needed
-    }
 }
