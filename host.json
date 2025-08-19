@@ -1,0 +1,21 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      }
+    }
+  },
+  "extensions": {
+    "durableTask": {
+      "hubName": "TaskHub"
+    },
+    "timers": {
+      "schedule": {
+        "ImportApprovedLeaveTimer": "0 0 2 * * *"
+      }
+    }
+  }
+}
